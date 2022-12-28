@@ -10,57 +10,29 @@ namespace ConsoleCalculatorApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("WELCOME TO THE CALCULATOR APP");
-            Console.WriteLine("------------------------------------------------------------------------------------------");
-            Console.WriteLine("This app acts like a calculator, only difference being developed on a console application.");
-            Console.WriteLine();
+            Console.WriteLine(
+                "WELCOME TO THE CALCULATOR APP\n------------------------------------------------------------------------------------------\nThis app acts like a calculator, only difference being developed on a console application.\n\n"
+                );
 
         OperatorInput:
 
-            Console.WriteLine("You can select any operator from the operators listed below:");
-            Console.WriteLine("A for Addition");
-            Console.WriteLine("S for Substraction");
-            Console.WriteLine("M for Multiplication");
-            Console.WriteLine("D for Division");
-            Console.WriteLine("C to Close the application");
+            Console.WriteLine(
+                "You can select any operator from the operators listed below:\n\nA for Addition\nS for Substraction\nM for Multiplication\nD for Division\nC to Close the application\n"
+                );
             Console.Write("Please enter the desired operation: ");
 
-            List<char> operationsList = new List<char>();
-            operationsList.Add('a');
-            operationsList.Add('s');
-            operationsList.Add('m');
-            operationsList.Add('d');
-            operationsList.Add('c');
+            List<char> operationsList = CreateAndReturnOperationsList();
 
-            char operation;
-
-            try
-            {
-                operation = Convert.ToChar(Console.ReadLine().Trim().ToLower());
-            }
-            catch
-            {
-                Console.Clear();
-                Console.WriteLine("You entered an invalid input. Please try again.");
-                Console.ReadKey();
-                Console.Clear();
-                goto OperatorInput;
-            }
+            char operation = ReturnOperationValue();
 
             if (!operationsList.Contains(operation))
             {
-                Console.Clear();
-                Console.WriteLine("You entered an invalid operation. Please try again.");
-                Console.ReadKey();
-                Console.Clear();
+                PrintMessage("opc2");
                 goto OperatorInput;
             }
             else if (operation == 'c')
             {
-                Console.Clear();
-                Console.WriteLine("Bye bye...");
-                Console.WriteLine("Press enter to close the application...");
-                Console.ReadKey();
+                PrintMessage("exit");
                 Environment.Exit(0);
             }
             else
@@ -71,18 +43,10 @@ namespace ConsoleCalculatorApp
 
                 Console.Write("Please enter the first number: ");
 
-                double numberOne;
+                double numberOne = ReturnDoubleNumberValue();
 
-                try
+                if (numberOne.Equals(double.NaN))
                 {
-                    numberOne = Convert.ToDouble(Console.ReadLine().Trim());
-                }
-                catch
-                {
-                    Console.Clear();
-                    Console.WriteLine("You entered an invalid value. Please try again.");
-                    Console.ReadKey();
-                    Console.Clear();
                     goto FirstNumber;
                 }
 
@@ -92,60 +56,25 @@ namespace ConsoleCalculatorApp
 
                 Console.Write("Please enter the second number: ");
 
-                double numberTwo;
+                double numberTwo = ReturnDoubleNumberValue();
 
-                try
+                if (numberTwo.Equals(double.NaN))
                 {
-                    numberTwo = Convert.ToDouble(Console.ReadLine().Trim());
-                }
-                catch
-                {
-                    Console.Clear();
-                    Console.WriteLine("You entered an invalid value. Please try again.");
-                    Console.ReadKey();
-                    Console.Clear();
                     goto SecondNumber;
                 }
-
-                if (operation == 'd' && numberTwo == 0d)
+                else if (operation == 'd' && numberTwo == 0d)
                 {
-                    Console.Clear();
-                    Console.WriteLine("The dividend cannot be zero. Please try another value.");
-                    Console.ReadKey();
-                    Console.Clear();
+                    PrintMessage("d0");
                     goto SecondNumber;
                 }
                 else if (operation == 'm' && numberOne == 0d && numberTwo == 0d)
                 {
-                    Console.Clear();
-                    Console.WriteLine("Zero cannot multiply by zero. Please try another value.");
-                    Console.ReadKey();
-                    Console.Clear();
+                    PrintMessage("m00");
                     goto SecondNumber;
                 }
                 else
                 {
-                    Console.Clear();
-
-                    double result = 0d;
-
-                    switch (operation)
-                    {
-                        case 'a':
-                            result = numberOne + numberTwo;
-                            break;
-                        case 's':
-                            result = numberOne - numberTwo;
-                            break;
-                        case 'm':
-                            result = numberOne * numberTwo;
-                            break;
-                        case 'd':
-                            result = numberOne / numberTwo;
-                            break;
-                    }
-
-                    Console.WriteLine("Result: " + result);
+                    PrintResult(operation, numberOne, numberTwo);
                 }
 
                 Console.ReadKey();
@@ -153,5 +82,126 @@ namespace ConsoleCalculatorApp
                 goto OperatorInput;
             }
         }
+
+        #region Methods
+
+        private static List<char> CreateAndReturnOperationsList()
+        {
+            return new List<char> { 'a', 's', 'm', 'd', 'c' };
+        }
+
+        private static char ReturnOperationValue()
+        {
+            char operation;
+
+            try
+            {
+                operation = Convert.ToChar(Console.ReadLine().Trim().ToLower());
+            }
+            catch
+            {
+                PrintMessage("opc");
+                return ' ';
+            }
+
+            return operation;
+        }
+
+        private static double ReturnResultValue(char operation, double numberOne, double numberTwo)
+        {
+            double result = 0d;
+
+            switch (operation)
+            {
+                case 'a':
+                    result = numberOne + numberTwo;
+                    break;
+                case 's':
+                    result = numberOne - numberTwo;
+                    break;
+                case 'm':
+                    result = numberOne * numberTwo;
+                    break;
+                case 'd':
+                    result = numberOne / numberTwo;
+                    break;
+            }
+
+            return result;
+        }
+
+        private static double ReturnDoubleNumberValue()
+        {
+            double number;
+
+            try
+            {
+                number = Convert.ToDouble(Console.ReadLine().Trim());
+            }
+            catch
+            {
+                PrintMessage("dNaN");
+                return double.NaN;
+            }
+
+            return number;
+        }
+
+        private static void PrintResult(char operation, double numberOne, double numberTwo)
+        {
+            Console.Clear();
+
+            double result = ReturnResultValue(operation, numberOne, numberTwo);
+
+            Console.WriteLine("Result: " + result);
+        }
+
+        private static void PrintMessage(string messageCode)
+        {
+            if (messageCode == "opc")
+            {
+                Console.Clear();
+                Console.WriteLine("You entered an invalid input. Please try again.");
+                Console.ReadKey();
+                Console.Clear();
+            }
+            else if (messageCode == "opc2")
+            {
+                Console.Clear();
+                Console.WriteLine("You entered an invalid operation. Please try again.");
+                Console.ReadKey();
+                Console.Clear();
+            }
+            else if (messageCode == "exit")
+            {
+                Console.Clear();
+                Console.WriteLine("Bye bye...");
+                Console.WriteLine("Press enter to close the application...");
+                Console.ReadKey();
+            }
+            else if (messageCode == "dNaN")
+            {
+                Console.Clear();
+                Console.WriteLine("You entered an invalid value. Please try again.");
+                Console.ReadKey();
+                Console.Clear();
+            }
+            else if (messageCode == "d0")
+            {
+                Console.Clear();
+                Console.WriteLine("The dividend cannot be zero. Please try another value.");
+                Console.ReadKey();
+                Console.Clear();
+            }
+            else if (messageCode == "m00")
+            {
+                Console.Clear();
+                Console.WriteLine("Zero cannot multiply by zero. Please try another value.");
+                Console.ReadKey();
+                Console.Clear();
+            }
+        }
+
+        #endregion
     }
 }
